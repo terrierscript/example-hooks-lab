@@ -1,12 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  Component,
-  Children,
-  ReactNode,
-  createContext
-} from "react"
+import React, { Component, ReactNode, createContext } from "react"
 
 const fib = (n) => {
   if (n < 2) {
@@ -45,7 +37,7 @@ class Fib extends Component<
 
 const CounterContext = createContext({
   count: 0,
-  setCount: (...args) => {}
+  setCount: (args) => {}
 })
 class Counter extends Component<{}, { count: number }> {
   constructor(props) {
