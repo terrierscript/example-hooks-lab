@@ -8,3 +8,5 @@ export const MyApp = () => {
 export const start = () => {
   render(<MyApp />, document.querySelector("#app"))
 }
+
+start()
