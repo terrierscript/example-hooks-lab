@@ -10,9 +10,11 @@ const useCounter = () => {
   const newFn = useCallback(() => {
     console.log("hello!", count)
   }, [count])
+
   useEffect(() => {
     setHelloFn({ fn: newFn })
   }, [newFn, setHelloFn])
+
   return {
     count,
     setCounter,
