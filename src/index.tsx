@@ -6,18 +6,17 @@ const initialHelloFn = () => {
 }
 const useCounter = () => {
   const [count, setCounter] = useState(0)
-  const [helloFn, setHelloFn] = useState<Function>(initialHelloFn)
+  const [helloFn, setHelloFn] = useState({ fn: initialHelloFn })
   const newFn = useCallback(() => {
     console.log("hello!", count)
   }, [count])
   useEffect(() => {
-    setHelloFn(newFn)
+    setHelloFn({ fn: newFn })
   }, [newFn, setHelloFn])
-  console.log(helloFn)
   return {
     count,
     setCounter,
-    helloFn
+    helloFn: helloFn.fn
   }
 }
 export const MyApp = () => {
