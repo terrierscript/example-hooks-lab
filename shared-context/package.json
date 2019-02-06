@@ -1,0 +1,24 @@
+{
+  "name": "dartystrap",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "inuscript <inuscript@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel serve src/index.html --no-autoinstall",
+    "build": "parcel build src/index.html",
+    "predeploy": "yarn build",
+    "deploy": "yarn build; netlify deploy"
+  },
+  "dependencies": {
+    "react": "^16.8.0-alpha.1",
+    "react-dom": "^16.8.0-alpha.1",
+    "typescript": "^3.0.0-rc"
+  },
+  "devDependencies": {
+    "@types/node": "^10.5.1",
+    "@types/react": "^16.4.6",
+    "@types/react-dom": "^16.0.6",
+    "parcel-bundler": "^1.11.0"
+  }
+}
