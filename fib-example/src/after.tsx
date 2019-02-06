@@ -1,6 +1,4 @@
 import React, {
-  Component,
-  ReactNode,
   createContext,
   useState,
   useContext,
