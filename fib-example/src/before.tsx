@@ -61,26 +61,30 @@ class Counter extends Component<{}, { count: number }> {
 }
 
 class Main extends Component {
-  static contextType = CounterContext
   render() {
-    const { count, setCount } = this.context
     return (
-      <Fib initialValue={count}>
-        {({ result, calcFib }) => {
+      <CounterContext.Consumer>
+        {({ count, setCount }) => {
           return (
-            <div>
-              <div>Count: {count}</div>
-              <div>
-                <button onClick={() => setCount(count + 1)}>+</button>
-              </div>
-              <div>Fib:{result}</div>
-              <div>
-                <button onClick={() => calcFib(count)}>Caclurate</button>
-              </div>
-            </div>
+            <Fib initialValue={count}>
+              {({ result, calcFib }) => {
+                return (
+                  <div>
+                    <div>Count: {count}</div>
+                    <div>
+                      <button onClick={() => setCount(count + 1)}>+</button>
+                    </div>
+                    <div>Fib:{result}</div>
+                    <div>
+                      <button onClick={() => calcFib(count)}>Caclurate</button>
+                    </div>
+                  </div>
+                )
+              }}
+            </Fib>
           )
         }}
-      </Fib>
+      </CounterContext.Consumer>
     )
   }
 }
