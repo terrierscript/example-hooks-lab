@@ -11,8 +11,8 @@
     "deploy": "yarn build; netlify deploy"
   },
   "dependencies": {
-    "react": "^16.8.0-alpha.1",
-    "react-dom": "^16.8.0-alpha.1",
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0",
     "typescript": "^3.0.0-rc"
   },
   "devDependencies": {
