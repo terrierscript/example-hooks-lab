@@ -48,7 +48,7 @@ const Num = () => {
 const Grid = styled.div`
   padding: 2em;
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(10, 1em);
   grid-template-rows: auto;
   text-align: center;
   /* grid-gap: 5px; */
