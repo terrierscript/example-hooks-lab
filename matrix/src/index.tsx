@@ -25,13 +25,15 @@ function useInterval(callback, delay) {
   }, [delay])
 }
 const randomNum = () => random(0, 10) - 1
-const useRandomNumber = () => {
+const useRandomNumber = (delay = null) => {
   const [num, setNum] = useState(" ")
-  const delay = useMemo(() => random(10, 1000), [])
+  const _delay = useMemo(() => {
+    return delay ? delay : random(10, 1000)
+  }, [delay])
 
   useInterval(() => {
     setNum(randomNum().toString())
-  }, delay)
+  }, _delay)
   return num
 }
 
@@ -41,8 +43,8 @@ const Item = styled.div`
   height: 1.5em;
 `
 
-const Num = () => {
-  const num = useRandomNumber()
+const Num = ({ delay }) => {
+  const num = useRandomNumber(delay)
   return <Item>{num}</Item>
 }
 const Grid = styled.div<any>`
@@ -54,7 +56,15 @@ const Grid = styled.div<any>`
   /* grid-gap: 5px; */
 `
 
-const Numbers = ({ row, col }) => {
+const maps = (col, row) => {
+  const items = Array.from({ length: row }).map((_, i) =>
+    Array.from({ length: col }).map((_, j) => [i, j])
+  )
+  return items.flat()
+}
+
+const Numbers = ({ row, col, randomDelay }) => {
+  const delay = useMemo(() => (randomDelay ? null : 10), [randomDelay])
   return (
     <>
       <Global
@@ -67,11 +77,9 @@ const Numbers = ({ row, col }) => {
         `}
       />
       <Grid col={col}>
-        {Array.from({ length: row }).map((_, i) =>
-          Array.from({ length: col }).map((_, j) => {
-            return <Num key={`${i}-${j}`} />
-          })
-        )}
+        {maps(col, row).map(([i, j]) => (
+          <Num key={`${i}-${j}`} delay={delay} />
+        ))}
       </Grid>
     </>
   )
@@ -88,19 +96,38 @@ const NumberInput = ({ name, value, update }) => (
     />
   </div>
 )
+const Checkbox = ({ name, value, update }) => (
+  <div>
+    {name}
+    <input
+      type="checkbox"
+      checked={value}
+      onChange={(v) => {
+        update(!!v.target.checked)
+      }}
+    />
+  </div>
+)
 
 const App = () => {
   const [started, setStarted] = useState(false)
-  const [row, setRow] = useState(50)
-  const [col, setCol] = useState(50)
+  const [row, setRow] = useState(10)
+  const [col, setCol] = useState(10)
+  const [randomDelay, setRandomDelay] = useState(true)
 
   if (started) {
-    return <Numbers row={row} col={col} />
+    return <Numbers row={row} col={col} randomDelay={randomDelay} />
   } else {
     return (
       <div>
+        <h1>Benchmark</h1>
         <NumberInput name={"row"} value={row} update={setRow} />
         <NumberInput name={"col"} value={col} update={setCol} />
+        <Checkbox
+          name={"random delay"}
+          value={randomDelay}
+          update={setRandomDelay}
+        />
         <button onClick={() => setStarted(true)}>Start</button>
       </div>
     )
