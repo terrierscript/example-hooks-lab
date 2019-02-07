@@ -12,8 +12,9 @@
   },
   "dependencies": {
     "@rehooks/device-orientation": "^1.0.0",
-    "react": "^16.8.0-alpha.1",
-    "react-dom": "^16.8.0-alpha.1",
+    "prop-types": "^15.6.2",
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0",
     "react-spring": "^8.0.2",
     "typescript": "^3.0.0-rc"
   },
