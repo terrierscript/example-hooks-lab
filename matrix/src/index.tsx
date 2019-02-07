@@ -45,10 +45,10 @@ const Num = () => {
   const num = useRandomNumber()
   return <Item>{num}</Item>
 }
-const Grid = styled.div`
+const Grid = styled.div<any>`
   padding: 2em;
   display: grid;
-  grid-template-columns: repeat(10, 1em);
+  grid-template-columns: ${(props) => `repeat(${props.col}, 1em)`};
   grid-template-rows: auto;
   text-align: center;
   /* grid-gap: 5px; */
@@ -66,7 +66,7 @@ const Numbers = ({ row, col }) => {
           }
         `}
       />
-      <Grid>
+      <Grid col={col}>
         {Array.from({ length: row }).map((_, i) =>
           Array.from({ length: col }).map((_, j) => {
             return <Num key={`${i}-${j}`} />
@@ -91,8 +91,8 @@ const NumberInput = ({ name, value, update }) => (
 
 const App = () => {
   const [started, setStarted] = useState(false)
-  const [row, setRow] = useState(10)
-  const [col, setCol] = useState(10)
+  const [row, setRow] = useState(50)
+  const [col, setCol] = useState(50)
 
   if (started) {
     return <Numbers row={row} col={col} />
