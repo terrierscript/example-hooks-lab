@@ -34,7 +34,6 @@ const useMapMount = ({ googleObj, mapContainerRef, mapConfig }) => {
 
 const useMapMarker = ({ positions, googleObj, mapObj }) => {
   const markers = useMemo(() => {
-    if (!googleObj || !mapObj) return
     const { Marker } = googleObj.maps
     positions.map((position) => {
       return new Marker({
@@ -49,20 +48,29 @@ const useMapMarker = ({ positions, googleObj, mapObj }) => {
 
 const useMapClickAppend = ({ addMarker, googleObj, mapObj }) => {
   useEffect(() => {
-    if (!googleObj || !mapObj) {
-      return
-    }
     googleObj.maps.event.addListener(mapObj, "click", (e) => {
       addMarker(e.latLng.lat(), e.latLng.lng())
     })
   }, [addMarker, googleObj, mapObj])
 }
 
-const useMap = ({ markers, addMarker, mapContainerRef, mapConfig }) => {
+const useMap = ({ mapContainerRef, mapConfig }) => {
   const googleObj = useGoogleMap(API_KEY)
   const mapObj = useMapMount({ googleObj, mapContainerRef, mapConfig })
+  if (!googleObj || !mapObj || !mapContainerRef.current) {
+    return null
+  }
+  return {
+    googleObj,
+    mapObj
+  }
+}
+
+// hooksを使うだけで何もしないコンポーネント
+const MapMarkers = ({ markers, addMarker, googleObj, mapObj }) => {
   useMapMarker({ positions: markers, googleObj, mapObj })
   useMapClickAppend({ addMarker, googleObj, mapObj })
+  return null
 }
 
 const Map = ({ markers, addMarker }) => {
@@ -71,8 +79,15 @@ const Map = ({ markers, addMarker }) => {
     center: markers[0]
   }
   const mapContainerRef = useRef(null)
-  useMap({ markers, addMarker, mapContainerRef, mapConfig })
-  return <MapContainer ref={mapContainerRef} />
+  const mapResult = useMap({ mapContainerRef, mapConfig })
+  return (
+    <div>
+      <MapContainer ref={mapContainerRef} />
+      {mapResult ? (
+        <MapMarkers markers={markers} addMarker={addMarker} {...mapResult} />
+      ) : null}
+    </div>
+  )
 }
 
 export const App = () => {
