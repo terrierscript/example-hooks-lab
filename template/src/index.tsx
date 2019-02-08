@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React from "react"
 import { render } from "react-dom"
 
-export const MyApp = () => {
-  return (
-    <div>
-    </div>
-  )
+export const App = () => {
+  return <div />
 }
 
 export const start = () => {
-  render(<MyApp />, document.querySelector("#app"))
+  render(<App />, document.querySelector("#app"))
 }
 
 start()

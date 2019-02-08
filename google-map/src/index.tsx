@@ -1,0 +1,99 @@
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
+import { render } from "react-dom"
+import GoogleMapsApiLoader from "google-maps-api-loader"
+import styled from "styled-components"
+const API_KEY = "AIzaSyCdsCZwgVbKBnvwqtPQ8Mqcv5P0lNzuxs8"
+
+const MapContainer = styled.div`
+  height: 100vh;
+  width: 100%;
+`
+
+const useGoogleMap = (apiKey) => {
+  const [googleObj, setGoogleObj] = useState<null | any>(null)
+  useEffect(() => {
+    GoogleMapsApiLoader({
+      apiKey
+    }).then((google) => {
+      setGoogleObj(google)
+    })
+  }, [])
+  return googleObj
+}
+const useMapMount = ({ googleObj, mapContainerRef, mapConfig }) => {
+  const [mapObj, setMapObj] = useState<null | any>(null)
+  useEffect(() => {
+    if (!googleObj) return
+    if (!mapContainerRef.current) return
+    const { Map } = googleObj.maps
+    const map = new Map(mapContainerRef.current, mapConfig)
+    setMapObj(map)
+  }, [googleObj])
+  return mapObj
+}
+
+const useMapMarker = ({ positions, googleObj, mapObj }) => {
+  const markers = useMemo(() => {
+    if (!googleObj || !mapObj) return
+    const { Marker } = googleObj.maps
+    positions.map((position) => {
+      return new Marker({
+        position: position,
+        map: mapObj,
+        title: "Child marker!"
+      })
+    })
+  }, [positions, googleObj, mapObj])
+  return markers
+}
+
+const useMapClickAppend = ({ addMarker, googleObj, mapObj }) => {
+  useEffect(() => {
+    if (!googleObj || !mapObj) {
+      return
+    }
+    googleObj.maps.event.addListener(mapObj, "click", (e) => {
+      addMarker(e.latLng.lat(), e.latLng.lng())
+    })
+  }, [addMarker, googleObj, mapObj])
+}
+
+const useMap = ({ markers, addMarker, mapContainerRef, mapConfig }) => {
+  const googleObj = useGoogleMap(API_KEY)
+  const mapObj = useMapMount({ googleObj, mapContainerRef, mapConfig })
+  useMapMarker({ positions: markers, googleObj, mapObj })
+  useMapClickAppend({ addMarker, googleObj, mapObj })
+}
+
+const Map = ({ markers, addMarker }) => {
+  const mapConfig = {
+    zoom: 12,
+    center: markers[0]
+  }
+  const mapContainerRef = useRef(null)
+  useMap({ markers, addMarker, mapContainerRef, mapConfig })
+  return <MapContainer ref={mapContainerRef} />
+}
+
+export const App = () => {
+  const [markers, setMarkers] = useState([
+    { lat: 35.6432027, lng: 139.6729435 },
+    { lat: 35.5279833, lng: 139.6989209 },
+    { lat: 35.6563623, lng: 139.7215211 },
+    { lat: 35.6167531, lng: 139.5469376 },
+    { lat: 35.6950961, lng: 139.5037899 }
+  ])
+  const addMarker = useCallback(
+    (lat, lng) => {
+      setMarkers([...markers, { lat, lng }])
+    },
+    [setMarkers]
+  )
+  return <Map markers={markers} addMarker={addMarker} />
+}
+
+export const start = () => {
+  render(<App />, document.querySelector("#root"))
+}
+
+start()
