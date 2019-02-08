@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+  useLayoutEffect
+} from "react"
 import { render } from "react-dom"
 import styled from "@emotion/styled"
 import { Global, css } from "@emotion/core"
@@ -14,7 +21,7 @@ function useInterval(callback, delay) {
   })
 
   // Set up the interval.
-  useEffect(() => {
+  useLayoutEffect(() => {
     function tick() {
       savedCallback.current()
     }
@@ -26,13 +33,13 @@ function useInterval(callback, delay) {
 }
 const randomNum = () => random(0, 10) - 1
 const useRandomNumber = (delay = null) => {
-  const [num, setNum] = useState(" ")
+  const [num, setNum] = useState(0)
   const _delay = useMemo(() => {
     return delay ? delay : random(10, 1000)
   }, [delay])
 
   useInterval(() => {
-    setNum(randomNum().toString())
+    setNum(randomNum())
   }, _delay)
   return num
 }
@@ -114,7 +121,14 @@ const App = () => {
   const [row, setRow] = useState(10)
   const [col, setCol] = useState(10)
   const [randomDelay, setRandomDelay] = useState(true)
-
+  useEffect(() => {
+    const params = {
+      started,
+      row,
+      col,
+      randomDelay
+    }
+  }, [started, row, col, randomDelay])
   if (started) {
     return <Numbers row={row} col={col} randomDelay={randomDelay} />
   } else {
