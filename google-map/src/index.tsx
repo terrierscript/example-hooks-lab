@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { render } from "react-dom"
 import GoogleMapsApiLoader from "google-maps-api-loader"
 import styled from "styled-components"
-const API_KEY = "AIzaSyCdsCZwgVbKBnvwqtPQ8Mqcv5P0lNzuxs8"
+import { API_KEY } from "./apikey"
 
 const MapContainer = styled.div`
   height: 100vh;
