@@ -1,1 +1,2 @@
-export const API_KEY = "AIzaSyCdsCZwgVbKBnvwqtPQ8Mqcv5P0lNzuxs8"
+// *.codesandbox/
+export const API_KEY = "AIzaSyA6TRM_BANi2TQkiKuWlkbDPi3y4TMIZaY"
