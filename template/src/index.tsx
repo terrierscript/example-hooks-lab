@@ -6,7 +6,7 @@ export const App = () => {
 }
 
 export const start = () => {
-  render(<App />, document.querySelector("#app"))
+  render(<App />, document.querySelector("#root"))
 }
 
 start()
