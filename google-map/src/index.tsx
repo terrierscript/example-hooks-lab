@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+  createContext
+} from "react"
 import { render } from "react-dom"
 import GoogleMapsApiLoader from "google-maps-api-loader"
 import styled from "styled-components"
@@ -10,21 +17,19 @@ const MapContainer = styled.div`
 `
 
 const useGoogleMap = (apiKey) => {
-  const [googleObj, setGoogleObj] = useState<null | any>(null)
+  const [googleObj, setGoogleObj] = useState(null)
   useEffect(() => {
-    GoogleMapsApiLoader({
-      apiKey
-    }).then((google) => {
+    GoogleMapsApiLoader({ apiKey }).then((google) => {
       setGoogleObj(google)
     })
   }, [])
   return googleObj
 }
+
 const useMapMount = ({ googleObj, mapContainerRef, mapConfig }) => {
   const [mapObj, setMapObj] = useState<null | any>(null)
   useEffect(() => {
-    if (!googleObj) return
-    if (!mapContainerRef.current) return
+    if (!googleObj || !mapContainerRef.current) return
     const { Map } = googleObj.maps
     const map = new Map(mapContainerRef.current, mapConfig)
     setMapObj(map)
@@ -35,13 +40,14 @@ const useMapMount = ({ googleObj, mapContainerRef, mapConfig }) => {
 const useMapMarker = ({ positions, googleObj, mapObj }) => {
   const markers = useMemo(() => {
     const { Marker } = googleObj.maps
-    positions.map((position) => {
-      return new Marker({
-        position: position,
-        map: mapObj,
-        title: "Child marker!"
-      })
-    })
+    positions.map(
+      (position) =>
+        new Marker({
+          position: position,
+          map: mapObj,
+          title: "Child marker!"
+        })
+    )
   }, [positions, googleObj, mapObj])
   return markers
 }
@@ -53,6 +59,11 @@ const useMapClickAppend = ({ addMarker, googleObj, mapObj }) => {
     })
   }, [addMarker, googleObj, mapObj])
 }
+
+const MapContext = createContext<null | {
+  googleObj: unknown
+  mapObj: unknown
+}>(null)
 
 const useMap = ({ mapContainerRef, mapConfig }) => {
   const googleObj = useGoogleMap(API_KEY)
@@ -70,22 +81,21 @@ const useMap = ({ mapContainerRef, mapConfig }) => {
 const MapMarkers = ({ markers, addMarker, googleObj, mapObj }) => {
   useMapMarker({ positions: markers, googleObj, mapObj })
   useMapClickAppend({ addMarker, googleObj, mapObj })
-  return null
+  return <script />
 }
 
-const Map = ({ markers, addMarker }) => {
+const Map = (props) => {
   const mapConfig = {
     zoom: 12,
-    center: markers[0]
+    center: props.markers[0]
   }
   const mapContainerRef = useRef(null)
   const mapResult = useMap({ mapContainerRef, mapConfig })
+  const isReady = mapResult !== null
   return (
     <div>
       <MapContainer ref={mapContainerRef} />
-      {mapResult ? (
-        <MapMarkers markers={markers} addMarker={addMarker} {...mapResult} />
-      ) : null}
+      {isReady && <MapMarkers {...props} {...mapResult} />}
     </div>
   )
 }
