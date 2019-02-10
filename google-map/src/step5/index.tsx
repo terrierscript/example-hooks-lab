@@ -34,44 +34,40 @@ const MapContainer = styled.div`
 const Cloak = styled.div`
   display: none;
 `
-const MarkerInfoWindow = ({ googleMap, map, marker, contentNode }) => {
+
+const MarkerInfoWindow = ({ googleMap, map, position, marker }) => {
+  const windowRef = useRef(null)
+
   useMapInfoWindow({
     googleMap,
     map,
     marker,
-    contentNode
+    contentNode: windowRef.current
   })
-  return null
-}
-
-const WindowContent = forwardRef<any, any>((props, ref) => {
-  const { position } = props
   return (
     <Cloak>
-      <div ref={ref}>
+      <div ref={windowRef}>
         hello, {position.lat}, {position.lng}
       </div>
     </Cloak>
   )
-})
+}
+
 const MarkerWithWindow = ({ googleMap, map, position, onClickMarker }) => {
-  const windowRef = useRef(null)
   const marker = useDrawMapMarker({
     googleMap,
     map,
     position,
     onClickMarker
   })
+
   return (
-    <>
-      <WindowContent ref={windowRef} position={position} />
-      <MarkerInfoWindow
-        googleMap={googleMap}
-        map={map}
-        marker={marker}
-        contentNode={windowRef.current}
-      />
-    </>
+    <MarkerInfoWindow
+      googleMap={googleMap}
+      map={map}
+      marker={marker}
+      position={position}
+    />
   )
 }
 

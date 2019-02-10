@@ -73,29 +73,34 @@ export const useDrawMapMarker = ({
       }
       markerObjectsRef.current.setMap(null)
     }
-  }, [googleMap, map])
+  }, [googleMap, map, onClickMarker])
   return markerObjectsRef.current
 }
 
 export const useMapInfoWindow = ({ googleMap, marker, map, contentNode }) => {
   const infoWindow = useRef(null)
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!marker) {
       return
     }
-    console.log(contentNode)
-    const i = new googleMap.maps.InfoWindow({
+    if (!contentNode) {
+      return
+    }
+    // infoWindowの再描画防止
+    if (infoWindow.current) {
+      return
+    }
+    const infoWindowObj = new googleMap.maps.InfoWindow({
       content: contentNode
     })
-    infoWindow.current = i
-
+    infoWindow.current = infoWindowObj
     marker.addListener("click", () => {
-      console.log(infoWindow.current)
       infoWindow.current.open(map, marker)
     })
   }, [googleMap, marker, contentNode])
   return infoWindow.current
 }
+
 const markerReducer = (state, action) => {
   switch (action.type) {
     case "ADD":
