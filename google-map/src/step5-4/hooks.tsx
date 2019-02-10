@@ -5,7 +5,8 @@ import {
   useReducer,
   useRef,
   useMemo,
-  useLayoutEffect
+  useLayoutEffect,
+  createContext
 } from "react"
 import GoogleMapsApiLoader from "google-maps-api-loader"
 // @ts-ignore
@@ -40,12 +41,11 @@ export const useMap = ({ googleMap, mapContainerRef, initialConfig }) => {
 }
 
 export const useDrawMapMarker = ({ position, googleMap, map }) => {
-  const markerObjectsRef = useRef(null)
   const [markerObject, setMarkerObject] = useState(null)
   useEffect(() => {
     const { Marker } = googleMap.maps
     // すでに描画済みなmarkerだったら描画しない
-    if (markerObjectsRef.current) {
+    if (markerObject) {
       return
     }
     const markerObj = new Marker({
@@ -53,53 +53,49 @@ export const useDrawMapMarker = ({ position, googleMap, map }) => {
       map,
       title: "marker!"
     })
-    markerObjectsRef.current = markerObj
+    // markerObjectsRef.current = markerObj
     setMarkerObject(markerObj)
     // コンポーネントが消えたらmarkerもmapから消すように仕掛ける。これはすっ
     return () => {
-      if (markerObjectsRef.current === null) {
+      if (markerObject === null) {
         return
       }
-      markerObjectsRef.current.setMap(null)
+      markerObject.setMap(null)
     }
-  }, [googleMap, map])
+  }, [googleMap, map, markerObject])
 
   return markerObject
 }
 
-export const useMarkerClickEvent = ({ marker, onClickMarker }) => {
+export const useMarkerEvent = ({ marker, eventHandler, eventName }) => {
   // イベントが変更される事を考慮する
   useEffect(() => {
     if (!marker) {
       return
     }
-    const listener = marker.addListener("click", (e) => {
-      onClickMarker(e)
+    const listener = marker.addListener(eventName, (e) => {
+      eventHandler(e)
     })
     return () => {
       listener.remove()
     }
-  }, [marker, onClickMarker])
+  }, [marker, eventHandler])
 }
 
 export const useMapInfoWindow = ({ googleMap, marker, contentNode }) => {
-  const infoWindow = useRef(null)
+  // const infoWindow = useRef(null)
   const [infoWindowState, setInfoWindow] = useState(null)
   useEffect(() => {
-    if (!marker) {
-      return
-    }
-    if (!contentNode) {
+    if (!marker || !contentNode) {
       return
     }
     // infoWindowの再描画防止
-    if (infoWindow.current) {
+    if (infoWindowState) {
       return
     }
     const infoWindowObj = new googleMap.maps.InfoWindow({
       content: contentNode
     })
-    infoWindow.current = infoWindowObj
 
     setInfoWindow(infoWindowObj)
   }, [googleMap, marker, contentNode])

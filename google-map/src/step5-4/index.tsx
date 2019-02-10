@@ -6,7 +6,8 @@ import {
   useMarkerState,
   useMapClickEvent,
   useMapInfoWindow,
-  useMarkerClickEvent
+  useMarkerClickEvent,
+  useMarkerEvent
 } from "./hooks"
 import styled from "styled-components"
 
@@ -34,18 +35,30 @@ const Cloak = styled.div`
   display: none;
 `
 
-const MarkerInfoWindow = ({ googleMap, map, marker, position }) => {
+const MarkerInfoWindow = ({
+  googleMap,
+  map,
+  marker,
+  position,
+  onDoubleClick
+}) => {
   const contentRef = useRef(null)
   const infoWindow = useMapInfoWindow({
     googleMap,
     marker,
     contentNode: contentRef.current
   })
-  useMarkerClickEvent({
+  useMarkerEvent({
     marker,
-    onClickMarker: () => {
+    eventName: "click",
+    eventHandler: () => {
       infoWindow.open(map, marker)
     }
+  })
+  useMarkerEvent({
+    marker,
+    eventName: "dblclick",
+    eventHandler: onDoubleClick
   })
   return (
     <Cloak>
@@ -56,7 +69,7 @@ const MarkerInfoWindow = ({ googleMap, map, marker, position }) => {
   )
 }
 
-const MarkerWithWindow = ({ googleMap, map, position }) => {
+const Marker = ({ googleMap, map, position }) => {
   const marker = useDrawMapMarker({
     googleMap,
     map,
@@ -88,15 +101,17 @@ const useMapMarkerSetup = ({ googleMap, map }) => {
 }
 
 const MapMarkers: React.SFC<any> = ({ map, googleMap }) => {
-  const { markers } = useMapMarkerSetup({ map, googleMap })
+  const { markers, removeMarker } = useMapMarkerSetup({ map, googleMap })
   return (
     <>
       {markers.map(({ id, position }) => (
-        <MarkerWithWindow
+        <Marker
           key={id} // hooksがkeyに紐づく。これがないと適切なマーカーが消えなくなる
           position={position}
           map={map}
-          onClickMarker={() => {}}
+          onClickMarker={() => {
+            removeMarker(id)
+          }}
           googleMap={googleMap}
         />
       ))}

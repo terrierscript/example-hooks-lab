@@ -1,16 +1,10 @@
-import React, { useRef, useContext } from "react"
-import {
-  useGoogleMap,
-  useMap,
-  useDrawMapMarker,
-  useMarkerState,
-  useMapClickEvent,
-  useMapInfoWindow,
-  useMarkerClickEvent,
-  useMarkerEvent
-} from "./hooks"
+import React, { useRef, useContext, useCallback } from "react"
+import { useGoogleMap, useMap, useMapClickEvent } from "./hooks/mapHooks"
+import { useMapInfoWindow } from "./hooks/infoWindowHooks"
+import { useDrawMapMarker, useMarkerEvent } from "./hooks/markerHooks"
+import { useMarkerState } from "./hooks/markerStateHooks"
 import styled from "styled-components"
-import { MapContext } from "./context"
+import { MapContext, MarkerContext } from "./context"
 
 const API_KEY = undefined
 
@@ -36,24 +30,16 @@ const Cloak = styled.div`
   display: none;
 `
 
-const MarkerInfoWindow = ({ marker, position, onDoubleClick }) => {
+const MarkerInfoWindow = ({ marker, position }) => {
   const { map } = useContext(MapContext)
   const contentRef = useRef(null)
-  const infoWindow = useMapInfoWindow({
-    marker,
-    contentNode: contentRef.current
-  })
+  // contentRefのDOMNodeを表示要素としたinfoWindowを作る
+  const infoWindow = useMapInfoWindow(contentRef.current)
+
   useMarkerEvent({
     marker,
     eventName: "click",
-    eventHandler: () => {
-      infoWindow.open(map, marker)
-    }
-  })
-  useMarkerEvent({
-    marker,
-    eventName: "dblclick",
-    eventHandler: onDoubleClick
+    eventHandler: () => infoWindow.open(map, marker)
   })
   return (
     <Cloak>
@@ -64,10 +50,11 @@ const MarkerInfoWindow = ({ marker, position, onDoubleClick }) => {
   )
 }
 
-const Marker = ({ position }) => {
+const Marker = ({ position, onDoubleClick }) => {
   const marker = useDrawMapMarker({
     position
   })
+  useMarkerEvent({ marker, eventName: "dblclick", eventHandler: onDoubleClick })
 
   return <MarkerInfoWindow marker={marker} position={position} />
 }
@@ -95,7 +82,7 @@ const MapMarkers: React.SFC<any> = () => {
         <Marker
           key={id} // hooksがkeyに紐づく。これがないと適切なマーカーが消えなくなる
           position={position}
-          onClickMarker={() => {
+          onDoubleClick={() => {
             removeMarker(id)
           }}
         />
