@@ -30,7 +30,12 @@ export const useMap = ({ googleMap, mapContainerRef, initialConfig }) => {
   return map
 }
 
-export const useMapMarker = ({ markers, googleMap, map, onClickMarker }) => {
+export const useDrawMapMarkers = ({
+  markers,
+  googleMap,
+  map,
+  onClickMarker
+}) => {
   // stateだと初回描画ほ保持がうまくいかないのでここではrefを利用する
   const markerObjectsRef = useRef({})
   useEffect(() => {

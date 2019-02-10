@@ -29,7 +29,6 @@ const MapContainer = styled.div`
   width: 100%;
 `
 
-// marker一つ一つを担当するComponent
 const Marker = ({ googleMap, map, position, onClickMarker }) => {
   useDrawMapMarker({
     googleMap,
@@ -40,9 +39,9 @@ const Marker = ({ googleMap, map, position, onClickMarker }) => {
   return null
 }
 
-const useMapMarkerSetup = ({ googleMap, map }) => {
-  const { addMarker, removeMarker, getMarkers } = useMarkerState(initialMarkers)
-  const markers = getMarkers()
+const MapMarkers = ({ map, googleMap }) => {
+  const { addMarker, removeMarker, markers } = useMarkerState(initialMarkers)
+  console.log(markers)
   // クリックイベントを追加
   useMapClickEvent({
     onClickMap: ({ lat, lng }) => {
@@ -51,25 +50,23 @@ const useMapMarkerSetup = ({ googleMap, map }) => {
     map,
     googleMap
   })
-  return { markers, removeMarker }
-}
-const MapMarkers: React.SFC<any> = ({ map, googleMap }) => {
-  const { markers, removeMarker } = useMapMarkerSetup({ map, googleMap })
-  return (
-    <>
-      {markers.map(({ id, position }) => (
-        <Marker
-          key={id} // hooksがkeyに紐づく。これがないと適切なマーカーが消えなくなる
-          position={position}
-          onClickMarker={() => {
-            removeMarker(id)
-          }}
-          map={map}
-          googleMap={googleMap}
-        />
-      ))}
-    </>
-  )
+  return markers.map((position, id) => {
+    if (!position) {
+      return null
+    }
+    console.log(id)
+    return (
+      <Marker
+        key={id}
+        position={position}
+        onClickMarker={() => {
+          removeMarker(id)
+        }}
+        map={map}
+        googleMap={googleMap}
+      />
+    )
+  })
 }
 
 const WaitForMap = ({ googleMap, map, children }) => {

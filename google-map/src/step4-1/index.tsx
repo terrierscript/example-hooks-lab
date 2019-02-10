@@ -2,10 +2,9 @@ import React, { useRef } from "react"
 import {
   useGoogleMap,
   useMap,
-  useMapMarker,
+  useDrawMapMarkers,
   useMarkerState,
-  useMapClickEvent,
-  useMarkerRemove
+  useMapClickEvent
 } from "./hooks"
 import styled from "styled-components"
 
@@ -34,7 +33,7 @@ const useMapMarkerSetup = ({ googleMap, map }) => {
   const { addMarker, removeMarker, getMarkers } = useMarkerState(initialMarkers)
   const markers = getMarkers()
   // 描画する
-  useMapMarker({
+  useDrawMapMarkers({
     markers,
     googleMap,
     map,

@@ -65,58 +65,20 @@ export const useDrawMapMarker = ({
   }, [googleMap, map])
 }
 
-const markerReducer = (state, action) => {
-  switch (action.type) {
-    case "ADD":
-      const id = uuid()
-      return {
-        ...state,
-        [id]: action.payload
-      }
-    case "REMOVE":
-      const { [action.payload]: removeItem, ...rest } = state
-      return rest
-    default:
-      return state
-  }
-}
-
-const mapReducerInitializer = (initialMarkers) => {
-  return initialMarkers.reduce((state, marker) => {
-    return markerReducer(state, {
-      type: "ADD",
-      payload: marker
-    })
-  }, {})
-}
-
 // markerをstate管理する
 export const useMarkerState = (initialMarkers) => {
-  const [markers, dispatch] = useReducer(
-    markerReducer,
-    initialMarkers,
-    mapReducerInitializer
-  )
-  // マーカーの追加・削除のaction関数
-  const addMarker = useCallback(
-    (position) => dispatch({ type: "ADD", payload: position }),
-    [dispatch]
-  )
-  const removeMarker = useCallback(
-    (removeUuid) => dispatch({ type: "REMOVE", payload: removeUuid }),
-    [dispatch]
-  )
-
-  // 外向けにはobjectではなくarrayとして返す
-  const getMarkers = useCallback(
-    () => Object.entries(markers).map(([id, position]) => ({ id, position })),
-    [markers]
-  )
+  const [markers, setMarkers] = useState(initialMarkers)
+  // マーカーの追加処理はsetMarkersを加工する形に
+  const addMarker = ({ lat, lng }) => {
+    setMarkers([...markers, { lat, lng }])
+  }
+  const removeMarker = (i) => {
+    setMarkers([...markers.slice(0, i), null, ...markers.slice(i + 1)])
+  }
   return {
-    // markers // objectとしてのmarkerは隠蔽する
+    markers,
     addMarker,
-    removeMarker,
-    getMarkers
+    removeMarker
   }
 }
 
@@ -124,6 +86,7 @@ export const useMarkerState = (initialMarkers) => {
 export const useMapClickEvent = ({ onClickMap, googleMap, map }) => {
   useEffect(() => {
     const listener = googleMap.maps.event.addListener(map, "click", (e) => {
+      console.log(e)
       onClickMap({
         lat: e.latLng.lat(),
         lng: e.latLng.lng()
