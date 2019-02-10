@@ -1,12 +1,15 @@
-import React, { useRef } from "react"
+import React, { useRef, useEffect, useMemo, forwardRef } from "react"
 import {
   useGoogleMap,
   useMap,
   useDrawMapMarker,
   useMarkerState,
-  useMapClickEvent
+  useMapClickEvent,
+  useMapInfoWindow
 } from "./hooks"
 import styled from "styled-components"
+import ReactDOM from "react-dom"
+import ReactDOMServer from "react-dom/server"
 
 const API_KEY = undefined
 
@@ -28,15 +31,48 @@ const MapContainer = styled.div`
   width: 100%;
 `
 
-// marker一つ一つを担当するComponent
-const Marker = ({ googleMap, map, position, onClickMarker }) => {
-  useDrawMapMarker({
+const Cloak = styled.div`
+  display: none;
+`
+const MarkerInfoWindow = ({ googleMap, map, marker, contentNode }) => {
+  useMapInfoWindow({
+    googleMap,
+    map,
+    marker,
+    contentNode
+  })
+  return null
+}
+
+const WindowContent = forwardRef<any, any>((props, ref) => {
+  const { position } = props
+  return (
+    <Cloak>
+      <div ref={ref}>
+        hello, {position.lat}, {position.lng}
+      </div>
+    </Cloak>
+  )
+})
+const MarkerWithWindow = ({ googleMap, map, position, onClickMarker }) => {
+  const windowRef = useRef(null)
+  const marker = useDrawMapMarker({
     googleMap,
     map,
     position,
     onClickMarker
   })
-  return null
+  return (
+    <>
+      <WindowContent ref={windowRef} position={position} />
+      <MarkerInfoWindow
+        googleMap={googleMap}
+        map={map}
+        marker={marker}
+        contentNode={windowRef.current}
+      />
+    </>
+  )
 }
 
 const useMapMarkerSetup = ({ googleMap, map }) => {
@@ -57,13 +93,11 @@ const MapMarkers: React.SFC<any> = ({ map, googleMap }) => {
   return (
     <>
       {markers.map(({ id, position }) => (
-        <Marker
+        <MarkerWithWindow
           key={id} // hooksがkeyに紐づく。これがないと適切なマーカーが消えなくなる
           position={position}
-          onClickMarker={() => {
-            removeMarker(id)
-          }}
           map={map}
+          onClickMarker={() => {}}
           googleMap={googleMap}
         />
       ))}
