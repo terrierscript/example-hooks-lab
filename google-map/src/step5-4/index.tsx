@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import React, { useRef, useState, useEffect, useLayoutEffect } from "react"
 import {
   useGoogleMap,
   useMap,
@@ -34,23 +34,22 @@ const Cloak = styled.div`
   display: none;
 `
 
-const MarkerInfoWindow = ({ googleMap, map, position, marker }) => {
-  const windowRef = useRef(null)
-
+const MarkerInfoWindow = ({ googleMap, map, marker, position }) => {
+  const contentRef = useRef(null)
   const infoWindow = useMapInfoWindow({
     googleMap,
-    map,
     marker,
-    contentNode: windowRef.current
+    contentNode: contentRef.current
   })
-  useMarkerClickEvent(marker, () => {
-    console.log(windowRef)
-    console.log(infoWindow)
-    console.log("a")
+  useMarkerClickEvent({
+    marker,
+    onClickMarker: () => {
+      infoWindow.open(map, marker)
+    }
   })
   return (
     <Cloak>
-      <div ref={windowRef}>
+      <div ref={contentRef}>
         hello, {position.lat}, {position.lng}
       </div>
     </Cloak>

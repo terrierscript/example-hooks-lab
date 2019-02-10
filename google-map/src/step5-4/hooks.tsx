@@ -41,6 +41,7 @@ export const useMap = ({ googleMap, mapContainerRef, initialConfig }) => {
 
 export const useDrawMapMarker = ({ position, googleMap, map }) => {
   const markerObjectsRef = useRef(null)
+  const [markerObject, setMarkerObject] = useState(null)
   useEffect(() => {
     const { Marker } = googleMap.maps
     // すでに描画済みなmarkerだったら描画しない
@@ -53,6 +54,7 @@ export const useDrawMapMarker = ({ position, googleMap, map }) => {
       title: "marker!"
     })
     markerObjectsRef.current = markerObj
+    setMarkerObject(markerObj)
     // コンポーネントが消えたらmarkerもmapから消すように仕掛ける。これはすっ
     return () => {
       if (markerObjectsRef.current === null) {
@@ -61,10 +63,11 @@ export const useDrawMapMarker = ({ position, googleMap, map }) => {
       markerObjectsRef.current.setMap(null)
     }
   }, [googleMap, map])
-  return markerObjectsRef.current
+
+  return markerObject
 }
 
-export const useMarkerClickEvent = (marker, onClickMarker) => {
+export const useMarkerClickEvent = ({ marker, onClickMarker }) => {
   // イベントが変更される事を考慮する
   useEffect(() => {
     if (!marker) {
@@ -79,8 +82,9 @@ export const useMarkerClickEvent = (marker, onClickMarker) => {
   }, [marker, onClickMarker])
 }
 
-export const useMapInfoWindow = ({ googleMap, marker, map, contentNode }) => {
+export const useMapInfoWindow = ({ googleMap, marker, contentNode }) => {
   const infoWindow = useRef(null)
+  const [infoWindowState, setInfoWindow] = useState(null)
   useEffect(() => {
     if (!marker) {
       return
@@ -96,11 +100,10 @@ export const useMapInfoWindow = ({ googleMap, marker, map, contentNode }) => {
       content: contentNode
     })
     infoWindow.current = infoWindowObj
-    marker.addListener("click", () => {
-      infoWindow.current.open(map, marker)
-    })
+
+    setInfoWindow(infoWindowObj)
   }, [googleMap, marker, contentNode])
-  return infoWindow.current
+  return infoWindowState
 }
 
 const markerReducer = (state, action) => {
