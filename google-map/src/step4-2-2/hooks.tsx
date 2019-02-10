@@ -32,11 +32,11 @@ export const useMap = ({ googleMap, mapContainerRef, initialConfig }) => {
 
 // 単体でマーカーを描画する
 export const useDrawMapMarker = ({ position, googleMap, map }) => {
-  const markerObjectsRef = useRef(null)
+  const [markerObject, setMarkerObject] = useState(null)
   useEffect(() => {
     const { Marker } = googleMap.maps
     // すでに描画済みなmarkerだったら描画しない
-    if (markerObjectsRef.current) {
+    if (markerObject) {
       return
     }
     const markerObj = new Marker({
@@ -44,16 +44,18 @@ export const useDrawMapMarker = ({ position, googleMap, map }) => {
       map,
       title: "marker!"
     })
-    markerObjectsRef.current = markerObj
+    // markerObjectsRef.current = markerObj
+    setMarkerObject(markerObj)
     // コンポーネントが消えたらmarkerもmapから消すように仕掛ける。これはすっ
     return () => {
-      if (markerObjectsRef.current === null) {
+      if (markerObject === null) {
         return
       }
-      markerObjectsRef.current.setMap(null)
+      markerObject.setMap(null)
     }
-  }, [googleMap, map])
-  return markerObjectsRef.current
+  }, [googleMap, map, markerObject])
+
+  return markerObject
 }
 
 export const useMarkerClickEvent = (marker, onClickMarker) => {
