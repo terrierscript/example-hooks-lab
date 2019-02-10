@@ -35,11 +35,11 @@ const Cloak = styled.div`
   display: none;
 `
 
-const MarkerInfoWindow = ({ googleMap, map, position, marker }) => {
+// const MarkerInfoWindow = ({ googleMap, map, position, marker }) => {
 
-  return (
-  )
-}
+//   return (
+//   )
+// }
 
 const MarkerWithWindow = ({ googleMap, map, position, onClickMarker }) => {
   const windowRef = useRef(null)

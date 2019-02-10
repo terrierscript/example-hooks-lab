@@ -73,7 +73,7 @@ export const useDrawMapMarker = ({
       }
       markerObjectsRef.current.setMap(null)
     }
-  }, [googleMap, map, onClickMarker])
+  }, [googleMap, map])
   return markerObjectsRef.current
 }
 

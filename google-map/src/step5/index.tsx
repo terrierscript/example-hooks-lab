@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, forwardRef } from "react"
+import React, { useRef } from "react"
 import {
   useGoogleMap,
   useMap,
@@ -8,8 +8,6 @@ import {
   useMapInfoWindow
 } from "./hooks"
 import styled from "styled-components"
-import ReactDOM from "react-dom"
-import ReactDOMServer from "react-dom/server"
 
 const API_KEY = undefined
 
@@ -86,7 +84,7 @@ const useMapMarkerSetup = ({ googleMap, map }) => {
 }
 
 const MapMarkers: React.SFC<any> = ({ map, googleMap }) => {
-  const { markers, removeMarker } = useMapMarkerSetup({ map, googleMap })
+  const { markers } = useMapMarkerSetup({ map, googleMap })
   return (
     <>
       {markers.map(({ id, position }) => (
