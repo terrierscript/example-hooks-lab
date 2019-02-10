@@ -91,31 +91,19 @@ export const useMarkerState = (initialMarkers) => {
   )
   // マーカーの追加・削除のaction関数
   const addMarker = useCallback(
-    (position) => {
-      dispatch({
-        type: "ADD",
-        payload: position
-      })
-    },
+    (position) => dispatch({ type: "ADD", payload: position }),
     [dispatch]
   )
   const removeMarker = useCallback(
-    (removeUuid) => {
-      dispatch({
-        type: "REMOVE",
-        payload: removeUuid
-      })
-    },
+    (removeUuid) => dispatch({ type: "REMOVE", payload: removeUuid }),
     [dispatch]
   )
 
   // 外向けにはobjectではなくarrayとして返す
-  const getMarkers = useCallback(() => {
-    return Object.entries(markers).map(([id, position]) => ({
-      id,
-      position
-    }))
-  }, [markers])
+  const getMarkers = useCallback(
+    () => Object.entries(markers).map(([id, position]) => ({ id, position })),
+    [markers]
+  )
 
   return {
     // markers // objectとしてのmarkerは隠蔽する
