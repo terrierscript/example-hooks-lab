@@ -4,7 +4,8 @@ import {
   useMap,
   useDrawMapMarker,
   useMarkerState,
-  useMapClickEvent
+  useMapClickEvent,
+  useMarkerClickEvent
 } from "./hooks"
 import styled from "styled-components"
 
@@ -30,12 +31,12 @@ const MapContainer = styled.div`
 
 // marker一つ一つを担当するComponent
 const Marker = ({ googleMap, map, position, onClickMarker }) => {
-  useDrawMapMarker({
+  const marker = useDrawMapMarker({
     googleMap,
     map,
-    position,
-    onClickMarker
+    position
   })
+  useMarkerClickEvent(marker, onClickMarker)
   return null
 }
 

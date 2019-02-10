@@ -31,13 +31,7 @@ export const useMap = ({ googleMap, mapContainerRef, initialConfig }) => {
 }
 
 // 単体でマーカーを描画する
-export const useDrawMapMarker = ({
-  position,
-  googleMap,
-  map,
-  onClickMarker
-}) => {
-  // stateだと初回描画ほ保持がうまくいかないのでここではrefを利用する
+export const useDrawMapMarker = ({ position, googleMap, map }) => {
   const markerObjectsRef = useRef(null)
   useEffect(() => {
     const { Marker } = googleMap.maps
@@ -50,10 +44,6 @@ export const useDrawMapMarker = ({
       map,
       title: "marker!"
     })
-    // markerがクリックされた時のイベントを追加する
-    markerObj.addListener("click", (e) => {
-      onClickMarker(e)
-    })
     markerObjectsRef.current = markerObj
     // コンポーネントが消えたらmarkerもmapから消すように仕掛ける。これはすっ
     return () => {
@@ -63,6 +53,22 @@ export const useDrawMapMarker = ({
       markerObjectsRef.current.setMap(null)
     }
   }, [googleMap, map])
+  return markerObjectsRef.current
+}
+
+export const useMarkerClickEvent = (marker, onClickMarker) => {
+  // イベントが変更される事を考慮する
+  useEffect(() => {
+    if (!marker) {
+      return
+    }
+    const listener = marker.addListener("click", (e) => {
+      onClickMarker(e)
+    })
+    return () => {
+      listener.remove()
+    }
+  }, [marker, onClickMarker])
 }
 
 const markerReducer = (state, action) => {
