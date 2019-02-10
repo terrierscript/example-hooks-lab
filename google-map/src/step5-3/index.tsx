@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, forwardRef } from "react"
+import React, { useRef, forwardRef } from "react"
 import {
   useGoogleMap,
   useMap,
@@ -9,8 +9,6 @@ import {
   useMarkerClickEvent
 } from "./hooks"
 import styled from "styled-components"
-import ReactDOM from "react-dom"
-import ReactDOMServer from "react-dom/server"
 
 const API_KEY = undefined
 
@@ -36,26 +34,40 @@ const Cloak = styled.div`
   display: none;
 `
 
-const MarkerInfoWindow = ({ googleMap, map, position, marker }) => {
-  const windowRef = useRef(null)
+const MarkerInfoWindowContent = forwardRef<any>(({ children }, ref) => (
+  <Cloak>
+    <div ref={ref}>{children}</div>
+  </Cloak>
+))
 
-  const windowInfo = useMapInfoWindow({
+const InfoWindow = ({ googleMap, map, marker, contentRef }) => {
+  const infoWindow = useMapInfoWindow({
     googleMap,
-    map,
     marker,
-    contentNode: windowRef.current
+    contentNode: contentRef.current
   })
-  console.log(windowInfo)
-
   useMarkerClickEvent(marker, () => {
-    windowInfo.open(marker)
+    infoWindow.open(map, marker)
   })
+  return null
+}
+const MarkerInfoWindow = ({ googleMap, map, position, marker }) => {
+  const contentRef = useRef(null)
+
   return (
-    <Cloak>
-      <div ref={windowRef}>
+    <>
+      <MarkerInfoWindowContent ref={contentRef}>
         hello, {position.lat}, {position.lng}
-      </div>
-    </Cloak>
+      </MarkerInfoWindowContent>
+      {contentRef.current && (
+        <InfoWindow
+          map={map}
+          googleMap={googleMap}
+          marker={marker}
+          contentRef={contentRef}
+        />
+      )}
+    </>
   )
 }
 
@@ -90,7 +102,7 @@ const useMapMarkerSetup = ({ googleMap, map }) => {
   return { markers, removeMarker }
 }
 const MapMarkers: React.SFC<any> = ({ map, googleMap }) => {
-  const { markers, removeMarker } = useMapMarkerSetup({ map, googleMap })
+  const { markers } = useMapMarkerSetup({ map, googleMap })
   return (
     <>
       {markers.map(({ id, position }) => (

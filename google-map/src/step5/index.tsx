@@ -84,6 +84,7 @@ const useMapMarkerSetup = ({ googleMap, map }) => {
   })
   return { markers, removeMarker }
 }
+
 const MapMarkers: React.SFC<any> = ({ map, googleMap }) => {
   const { markers, removeMarker } = useMapMarkerSetup({ map, googleMap })
   return (

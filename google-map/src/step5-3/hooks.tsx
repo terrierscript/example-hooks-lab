@@ -84,9 +84,11 @@ export const useMarkerClickEvent = (marker, onClickMarker) => {
   }, [marker, onClickMarker])
 }
 
-export const useMapInfoWindow = ({ googleMap, marker, map, contentNode }) => {
+export const useMapInfoWindow = ({ googleMap, marker, contentNode }) => {
   const infoWindow = useRef(null)
   useEffect(() => {
+    console.log({ googleMap, marker, contentNode })
+    console.log("wwww")
     if (!marker) {
       return
     }
@@ -97,13 +99,11 @@ export const useMapInfoWindow = ({ googleMap, marker, map, contentNode }) => {
     if (infoWindow.current) {
       return
     }
+    console.log("aaa")
     const infoWindowObj = new googleMap.maps.InfoWindow({
       content: contentNode
     })
     infoWindow.current = infoWindowObj
-    marker.addListener("click", () => {
-      infoWindow.current.open(map, marker)
-    })
   }, [googleMap, marker, contentNode])
   return infoWindow.current
 }
