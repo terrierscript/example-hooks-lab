@@ -44,7 +44,7 @@ const MarkerInfoWindow = ({ marker, position }) => {
   return (
     <Cloak>
       <div ref={contentRef}>
-        hello, {position.lat}, {position.lng}
+        <b>hello</b>, {position.lat}, {position.lng}
       </div>
     </Cloak>
   )
